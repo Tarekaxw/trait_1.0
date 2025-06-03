@@ -15,6 +15,7 @@ node server.js
 ```
 
 Der Server läuft standardmäßig auf Port `3000`.
+Rufe danach im Browser `http://localhost:3000/` auf, um eine kleine Demo-Oberfläche für Journaleinträge, To-dos und Events zu sehen.
 
 ## Endpunkte
 

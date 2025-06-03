@@ -1,13 +1,15 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 let journalEntries = [];
 let todos = [];
 let events = [];
 
 app.get('/', (req, res) => {
-  res.send('Trait 1.0 API');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Journal endpoints

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<title>Trait 1.0 Demo</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 2rem; }
+section { margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+<h1>Trait 1.0 Demo</h1>
+
+<section id="journals">
+  <h2>Journaleinträge</h2>
+  <form id="journalForm">
+    <input type="text" id="journalText" placeholder="Text" required>
+    <button type="submit">Hinzufügen</button>
+  </form>
+  <ul id="journalList"></ul>
+</section>
+
+<section id="todos">
+  <h2>To-dos</h2>
+  <form id="todoForm">
+    <input type="text" id="todoText" placeholder="Text" required>
+    <button type="submit">Hinzufügen</button>
+  </form>
+  <ul id="todoList"></ul>
+</section>
+
+<section id="events">
+  <h2>Events</h2>
+  <form id="eventForm">
+    <input type="text" id="eventTitle" placeholder="Titel" required>
+    <input type="datetime-local" id="eventTime" required>
+    <button type="submit">Hinzufügen</button>
+  </form>
+  <ul id="eventList"></ul>
+</section>
+
+<script>
+async function fetchData() {
+  const [journals, todos, events] = await Promise.all([
+    fetch('/journals').then(r => r.json()),
+    fetch('/todos').then(r => r.json()),
+    fetch('/events').then(r => r.json())
+  ]);
+
+  const journalList = document.getElementById('journalList');
+  journalList.innerHTML = '';
+  journals.forEach(j => {
+    const li = document.createElement('li');
+    li.textContent = j.text + ' (' + new Date(j.date).toLocaleString() + ')';
+    journalList.appendChild(li);
+  });
+
+  const todoList = document.getElementById('todoList');
+  todoList.innerHTML = '';
+  todos.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t.text;
+    todoList.appendChild(li);
+  });
+
+  const eventList = document.getElementById('eventList');
+  eventList.innerHTML = '';
+  events.forEach(e => {
+    const li = document.createElement('li');
+    li.textContent = e.title + ' - ' + e.time;
+    eventList.appendChild(li);
+  });
+}
+
+document.getElementById('journalForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = document.getElementById('journalText').value;
+  await fetch('/journals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  });
+  document.getElementById('journalText').value = '';
+  fetchData();
+});
+
+document.getElementById('todoForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = document.getElementById('todoText').value;
+  await fetch('/todos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  });
+  document.getElementById('todoText').value = '';
+  fetchData();
+});
+
+document.getElementById('eventForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const title = document.getElementById('eventTitle').value;
+  const time = document.getElementById('eventTime').value;
+  await fetch('/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, time })
+  });
+  document.getElementById('eventTitle').value = '';
+  document.getElementById('eventTime').value = '';
+  fetchData();
+});
+
+fetchData();
+</script>
+</body>
+</html>
